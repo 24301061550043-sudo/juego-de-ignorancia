@@ -1,0 +1,394 @@
+import random
+from tkinter import *
+from tkinter import ttk
+from tkinter import messagebox
+from conecta_bd import *
+from ed_categoria import *
+from ed_pregunta import *
+
+
+#definicion de la pantalla
+pantalla = Tk()
+pantalla.resizable(1,1)
+pantalla.geometry("1200x700")
+pantalla.config(background="Light Sky Blue")
+pantalla.title("jeuego de la ignorancia")
+
+fon=PhotoImage(file=r".\fotos\cancha.png")
+fondo=Label(pantalla,image=fon,bg="Light Sky Blue", width=1200,height=600).place(x=0,y=150)
+
+seleccion=()
+str_preg=StringVar()
+str_res1=StringVar()
+str_res2=StringVar()
+str_res3=StringVar()
+str_res4=StringVar()
+str_sig=StringVar()
+correcto=0
+x1=10
+x2=10
+x3=10
+x4=10
+turno=1
+
+nombre1 = StringVar()
+nombre2 = StringVar()
+nombre3 = StringVar()
+
+puntos1 = 0
+puntos2 = 0
+puntos3 = 0
+
+str_puntos1 = StringVar()
+str_puntos2 = StringVar()
+str_puntos3 = StringVar()
+
+str_puntos1.set("Puntos J1: 0")
+str_puntos2.set("Puntos J2: 0")
+str_puntos3.set("Puntos J3: 0")
+
+def avanza_jug():
+	global x1,x2,x3
+	if turno==1:
+		x1=x1+100
+		j1.place(x=x1,y=160)
+	elif turno==2:
+		x2=x2+100
+		j2.place(x=x2,y=285)
+	elif turno==3:
+		x3=x3+100
+		j3.place(x=x3,y=430)
+
+def opc1():
+    global turno,x4
+    r1.config(state=DISABLED)
+    r2.config(state=DISABLED)
+    r3.config(state=DISABLED)
+    r4.config(state=DISABLED)
+    if correcto==1:
+        avanza_jug()
+    else:
+        x4=x4+100
+        bu.place(x=x4, y=570)
+    verificar_ganador()
+    turno=turno+1
+    if turno>3:
+        turno=1
+    if turno == 1:
+        str_sig.set(nombre1.get())
+
+    elif turno == 2:
+        str_sig.set(nombre2.get())
+
+    elif turno == 3:
+        str_sig.set(nombre3.get())
+
+def opc2():
+    global turno,x4
+    r1.config(state=DISABLED)
+    r2.config(state=DISABLED)
+    r3.config(state=DISABLED)
+    r4.config(state=DISABLED)
+    if correcto==2:
+        avanza_jug()
+    else:
+        x4=x4+100
+        bu.place(x=x4, y=570)
+    verificar_ganador()
+    turno=turno+1
+    if turno>3:
+        turno=1
+    if turno == 1:
+        str_sig.set(nombre1.get())
+
+    elif turno == 2:
+        str_sig.set(nombre2.get())
+
+    elif turno == 3:
+        str_sig.set(nombre3.get())
+
+def opc3():
+    global turno,x4
+    r1.config(state=DISABLED)
+    r2.config(state=DISABLED)
+    r3.config(state=DISABLED)
+    r4.config(state=DISABLED)
+    if correcto==3:
+        avanza_jug()
+    else:
+        x4=x4+100
+        bu.place(x=x4, y=570)
+    verificar_ganador()
+    turno=turno+1
+    if turno>3:
+        turno=1
+    if turno == 1:
+        str_sig.set(nombre1.get())
+
+    elif turno == 2:
+        str_sig.set(nombre2.get())
+
+    elif turno == 3:
+        str_sig.set(nombre3.get())
+
+def opc4(): 
+	global turno,x4
+	r1.config(state=DISABLED)
+	r2.config(state=DISABLED)
+	r3.config(state=DISABLED)
+	r4.config(state=DISABLED)
+	if correcto==4:
+		avanza_jug()
+	else:
+		x4=x4+100
+		bu.place(x=x4, y=570)
+	turno=turno+1
+	if turno>3:
+		turno=1
+	str_sig.set('Jugador '+str(turno))
+
+
+def sel_preg():
+	global str_preg
+	global correcto
+	tam=len(seleccion)
+	if tam!=0:
+		n = random.randint(0, tam-1)
+		#print(n)
+		str_preg.set(seleccion[n][1])
+		str_res1.set(seleccion[n][2])
+		str_res2.set(seleccion[n][3])
+		str_res3.set(seleccion[n][4])
+		str_res4.set(seleccion[n][5])
+		correcto=seleccion[n][6]
+		r1.config(state=NORMAL)
+		r2.config(state=NORMAL)
+		r3.config(state=NORMAL)
+		r4.config(state=NORMAL)
+	else:
+		str_preg.set('Categoria sin pregunta')
+		str_res1.set('')
+		str_res2.set('')
+		str_res3.set('')
+		str_res4.set('')
+		r1.config(state=DISABLED)
+		r2.config(state=DISABLED)
+		r3.config(state=DISABLED)
+		r4.config(state=DISABLED)
+
+	#pantalla.update()
+
+def preguntas(event):
+	global seleccion
+	cat = event.widget.get()
+	cat=str(cat).replace("_"," ")
+	seleccion=recupera_preguntas(cat)
+	sel_preg()
+
+
+def pregunta_sig():
+	global seleccion
+	cat = categorias.get()
+	cat=str(cat).replace("_"," ")
+	seleccion=recupera_preguntas(cat)
+	sel_preg()
+
+def ventana_jugadores():
+
+    ventana = Toplevel()
+
+    ventana.geometry("300x350")
+    ventana.config(bg="black")
+    ventana.title("Jugadores")
+
+    Label(
+        ventana,
+        text="Jugador 1",
+        bg="orange",
+        font='Helvetica 16 bold'
+    ).place(x=25, y=20)
+
+    jug1 = Entry(
+        ventana,
+        textvariable=nombre1,
+        font='Helvetica 14',
+        width=20
+    )
+    jug1.place(x=25, y=60)
+
+    Label(
+        ventana,
+        text="Jugador 2",
+        bg="orange",
+        font='Helvetica 16 bold'
+    ).place(x=25, y=110)
+
+    jug2 = Entry(
+        ventana,
+        textvariable=nombre2,
+        font='Helvetica 14',
+        width=20
+    )
+    jug2.place(x=25, y=150)
+
+    Label(
+        ventana,
+        text="Jugador 3",
+        bg="orange",
+        font='Helvetica 16 bold'
+    ).place(x=25, y=200)
+
+    jug3 = Entry(
+        ventana,
+        textvariable=nombre3,
+        font='Helvetica 14',
+        width=20
+    )
+    jug3.place(x=25, y=240)
+
+    def guardar():
+
+        # bloquear cambios
+        jug1.config(state="disabled")
+        jug2.config(state="disabled")
+        jug3.config(state="disabled")
+
+        # desactivar botón guardar
+        boton_guardar.config(state="disabled")
+
+        # actualizar jugador actual
+        str_sig.set(nombre1.get())
+
+    boton_guardar = Button(
+        ventana,
+        text="Guardar jugadores",
+        command=guardar,
+        bg="orange",
+        fg="black",
+        font='Helvetica 14 bold'
+    )
+
+    boton_guardar.place(x=25, y=290)
+
+def edita_categoria(): # 1
+	manipula_categorias()
+
+def verificar_ganador():
+    global x1, x2, x3, x4
+
+    if x1 >= 1000:
+        messagebox.showinfo("GANADOR", "Jugador 1 ganó")
+        pantalla.destroy()
+
+    elif x2 >= 1000:
+        messagebox.showinfo("GANADOR", "Jugador 2 ganó")
+        pantalla.destroy()
+
+    elif x3 >= 1000:
+        messagebox.showinfo("GANADOR", "Jugador 3 ganó")
+        pantalla.destroy()
+
+    elif x4 >= 1000:
+        messagebox.showinfo("PERDISTE", "La Ignorancia ganó")
+        pantalla.destroy()
+
+
+
+l_cats=recupera_categoria()
+# los espacios en blancodel combo de tkinter agregar llaves en el contenido
+# para eliminar ese problema recorremos el conjunto y cambiamos los espacios
+# # por guion bajo 
+cats=[]
+for cat in l_cats:
+	cat2=str(cat[0]).replace(" ","_")
+	cats.append(cat2)
+
+eti = Label(pantalla, bg="Light Sky Blue", text="Categorias", font='Helvetica 18 bold')
+eti.place(x=10, y=10)
+categorias=ttk.Combobox(pantalla,font='Helvetica 18 bold')
+categorias['values']=cats
+categorias.place(x=150, y=10)
+categorias.bind("<<ComboboxSelected>>", preguntas)
+
+Button(
+    pantalla,
+    text="Jugadores",
+    command=ventana_jugadores,
+    bg="blue",
+    fg="white",
+    font='Helvetica 14 bold'
+).place(x=1100, y=10)
+
+sig = Button(pantalla, text="siguiente", command=pregunta_sig, font='Helvetica 14 bold ',bg="Green", fg="white")
+sig.place(x=650, y=10)
+
+
+sig = Button(pantalla, text="categorias", command=edita_categoria, font='Helvetica 14 bold ',bg="Green", fg="white")
+sig.place(x=770, y=10)
+
+
+str_sig.set('Jugador 1')
+sig_jug = Label(pantalla, bg="Light Sky Blue", textvariable=str_sig, font='Helvetica 18 bold')
+sig_jug.place(x=500, y=10)
+
+eti = Label(pantalla, bg="Light Sky Blue", text="Pregunta", font='Helvetica 18 bold')
+eti.place(x=10, y=60)
+
+str_preg.set("")
+pre = Entry(pantalla, textvariable=str_preg, font='Helvetica 18 bold', bg="Lavender", width=100, state=DISABLED )
+pre.place(x=150, y=60)
+
+str_res1.set("")
+r1 = Button(pantalla, textvariable=str_res1, command=opc1, font='Helvetica 14 bold',bg="blue", fg="white", width=20)
+r1.place(x=100, y=110)
+
+str_res2.set("")
+r2 = Button(pantalla, textvariable=str_res2, command=opc2, font='Helvetica 14 bold',bg="blue", fg="white", width=20)
+r2.place(x=360, y=110)
+
+str_res3.set("")
+r3 = Button(pantalla, textvariable=str_res3, command=opc3, font='Helvetica 14 bold',bg="blue", fg="white", width=20)
+r3.place(x=620, y=110)
+
+str_res4.set("")
+r4 = Button(pantalla, textvariable=str_res4, command=opc4, font='Helvetica 14 bold',bg="blue", fg="white", width=20)
+r4.place(x=880, y=110)
+
+ju1=PhotoImage(file=r"./fotos/cristiano_ronaldo.png")
+j1=Label(pantalla,image=ju1,bg="Light Sky Blue",width=65,height=100)
+j1.place(x=10, y=160)
+ 
+ju2=PhotoImage(file=r"./fotos/messi.png")
+j2=Label(pantalla,image=ju2,bg="Light Sky Blue",width=70,height=110)
+j2.place(x=10, y=285)
+
+ju3=PhotoImage(file=r"./fotos/neymar.png")
+j3=Label(pantalla,image=ju3,bg="Light Sky Blue",width=80,height=130)
+j3.place(x=10,y=430)
+
+bur=PhotoImage(file=r"./fotos/ronaldinho.png")
+bu=Label(pantalla,image=bur,bg="Light Sky Blue",width=60 ,height=100)
+bu.place(x=10,y=570)
+
+Label(
+    pantalla,
+    textvariable=str_puntos1,
+    bg="yellow",
+    font='Helvetica 10 bold'
+).place(x=900, y=10)
+
+Label(
+    pantalla,
+    textvariable=str_puntos2,
+    bg="yellow",
+    font='Helvetica 10 bold'
+).place(x=900, y=35)
+
+Label(
+    pantalla,
+    textvariable=str_puntos3,
+    bg="yellow",
+    font='Helvetica 10 bold'
+).place(x=990, y=10)
+
+pantalla.mainloop()
